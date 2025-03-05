@@ -1,6 +1,4 @@
-Below is an updated README for your project, now named **QuakeWatch**:
-
----
+![Screenshot of QuakeWatch](static/experts-logo.svg)
 
 # QuakeWatch
 
