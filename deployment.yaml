@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quakewatch-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: quakewatch
+  template:
+    metadata:
+      labels:
+        app: quakewatch
+    spec:
+      containers:
+      - name: quakewatch-container
+        image: doragayev9/quakewatch:latest
+        ports:
+        - containerPort: 5000
+        env:
+          - name: APP_TITLE
+            valueFrom:
+              configMapKeyRef:
+                name: quakewatch-config
+                key: APP_TITLE
+          - name: API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: quakewatch-config
+                key: API_URL
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: quakewatch-secret
+                key: DB_PASSWORD

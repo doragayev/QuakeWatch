@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: quakewatch-pod
+  labels:
+    app: quakewatch
+spec:
+  containers:
+  - name: quakewatch-container
+ס    ports:
+    - containerPort: 5000
+

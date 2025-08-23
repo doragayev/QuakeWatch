@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quakewatch-config
+data:
+  APP_TITLE: "QuakeWatch Dashboard"
+  API_URL: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+
