@@ -1,9 +1,10 @@
 replicaCount: 1
 
 image:
-  repository: "your-dockerhub-username/quakewatch"
+  repository: "doragayev/quakewatch"
   tag: "latest"
   pullPolicy: IfNotPresent
+
 
 service:
   type: ClusterIP
