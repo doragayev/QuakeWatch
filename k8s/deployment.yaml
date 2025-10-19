@@ -2,8 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: quakewatch
+  namespace: quakewatch
   labels:
     app: quakewatch
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   replicas: 1
   selector:
@@ -16,7 +19,7 @@ spec:
     spec:
       containers:
         - name: quakewatch
-          image: nginx:stable   # נחליף אחר כך ל-image של QuakeWatch שלך
+          image: nginx:stable   # תחליף בהמשך ל-image של QuakeWatch שלך
           ports:
             - containerPort: 80
           readinessProbe:
@@ -27,3 +30,9 @@ spec:
             httpGet: { path: /, port: 80 }
             initialDelaySeconds: 10
             periodSeconds: 10
+          env:
+            - name: APP_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: quakewatch-config
+                  key: APP_MODE

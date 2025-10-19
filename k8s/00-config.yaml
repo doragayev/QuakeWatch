@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quakewatch-config
+  namespace: quakewatch
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+  APP_MODE: "prod"

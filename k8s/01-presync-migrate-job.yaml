@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: quakewatch-presync-migrate
+  namespace: quakewatch
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: alpine:3.20
+          command: ["/bin/sh","-c"]
+          args:
+            - echo "Running pre-deploy migration..." && sleep 3 && echo "Done"
