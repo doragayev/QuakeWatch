@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: quakewatch
+  namespace: quakewatch
+  labels:
+    release: monitoring           # ← חייב להתאים ל-*name* של ההתקנה: "monitoring"
+spec:
+  namespaceSelector:
+    matchNames:
+      - quakewatch
+  selector:
+    matchLabels:
+      app: quakewatch             # ← בוחר את השירות: metadata.labels.app=quakewatch
+  endpoints:
+    - port: http                  # ← חייב להתאים ל-ports[*].name בשירות
+      path: /metrics
+      interval: 15s
