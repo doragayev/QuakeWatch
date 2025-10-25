@@ -1,0 +1,236 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "System Overview Dashboard",
+    "tags": ["overview", "system", "monitoring"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "5s",
+    "time": {
+      "from": "now-30m",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"quakewatch\"}",
+            "legendFormat": "QuakeWatch Status",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Prometheus Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"prometheus\"}",
+            "legendFormat": "Prometheus Status",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Grafana Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"grafana\"}",
+            "legendFormat": "Grafana Status",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "ArgoCD Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"argocd\"}",
+            "legendFormat": "ArgoCD Status",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Overall System Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(up{job=~\"quakewatch|prometheus|grafana|argocd\"})",
+            "legendFormat": "System Health %",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.5},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Active Services",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(up{job=~\"quakewatch|prometheus|grafana|argocd\"} == 1)",
+            "legendFormat": "Active Services",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"}
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "QuakeWatch Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(quakewatch_requests_total[1m])",
+            "legendFormat": "{{method}} {{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+        "yAxes": [
+          {
+            "label": "Requests/sec",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Cluster Resource Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "CPU {{instance}}",
+            "refId": "A"
+          },
+          {
+            "expr": "100 - ((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100)",
+            "legendFormat": "Memory {{instance}}",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+        "yAxes": [
+          {
+            "label": "Usage %",
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Service Status Timeline",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "up{job=\"quakewatch\"}",
+            "legendFormat": "QuakeWatch",
+            "refId": "A"
+          },
+          {
+            "expr": "up{job=\"prometheus\"}",
+            "legendFormat": "Prometheus",
+            "refId": "B"
+          },
+          {
+            "expr": "up{job=\"grafana\"}",
+            "legendFormat": "Grafana",
+            "refId": "C"
+          },
+          {
+            "expr": "up{job=\"argocd\"}",
+            "legendFormat": "ArgoCD",
+            "refId": "D"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 20},
+        "yAxes": [
+          {
+            "label": "Status",
+            "min": 0,
+            "max": 1
+          }
+        ]
+      }
+    ]
+  }
+}
