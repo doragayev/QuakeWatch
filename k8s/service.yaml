@@ -12,6 +12,6 @@ spec:
   selector:
     app: quakewatch
   ports:
-    - name: http       # חייב להתאים לשם שה-ServiceMonitor יבחר
+    - name: http
       port: 80
-      targetPort: 8080 # חייב להתאים ל-containerPort של ה-Deployment
+      targetPort: 8080

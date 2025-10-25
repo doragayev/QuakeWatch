@@ -4,15 +4,14 @@ metadata:
   name: quakewatch
   namespace: quakewatch
   labels:
-    release: monitoring   # חייב להתאים לשם ההתקנה של kube-prometheus-stack
+    release: monitoring
 spec:
   namespaceSelector:
-    matchNames:
-      - quakewatch
+    matchNames: ["quakewatch"]
   selector:
     matchLabels:
-      app: quakewatch     # חייב להתאים ל-label של ה-Service
+      app: quakewatch
   endpoints:
-    - port: http          # חייב להיות בדיוק השם שב-Service למעלה
+    - port: http
       path: /metrics
       interval: 15s
