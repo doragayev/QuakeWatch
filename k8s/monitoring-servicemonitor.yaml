@@ -4,14 +4,14 @@ metadata:
   name: quakewatch
   namespace: quakewatch
   labels:
-    release: monitoring           # חייב להתאים לשם ההלם-ריליס: "monitoring"
+    release: monitoring           # חייב להתאים לשם ההתקנה של helm (monitoring)
 spec:
   namespaceSelector:
     matchNames:
       - quakewatch
   selector:
     matchLabels:
-      app: quakewatch             # מתאים ל-label של ה-Service
+      app: quakewatch             # חייב להתאים ל-label של ה-Service
   endpoints:
     - port: http                  # חייב להתאים לשם הפורט בשירות
       path: /metrics
