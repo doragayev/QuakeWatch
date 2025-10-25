@@ -4,9 +4,10 @@ matplotlib.use('Agg')  # Force non-GUI backend before any other matplotlib impor
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask
+from flask import Flask, request
 from dashboard import dashboard_blueprint
 from utils import timestamp_to_str  # Import our custom filter
+from metrics import get_metrics, increment_request_count, track_request_duration
 
 def create_app():
     app = Flask(__name__)
@@ -33,8 +34,20 @@ def create_app():
 
     @app.before_request
     def log_request_info():
-        from flask import request
         usage_logger.info(f"{request.remote_addr} - {request.method} {request.url}")
+
+    @app.after_request
+    def track_request_metrics(response):
+        # Track request metrics
+        endpoint = request.endpoint or 'unknown'
+        status = str(response.status_code)
+        increment_request_count(request.method, endpoint, status)
+        return response
+
+    # Add metrics endpoint
+    @app.route('/metrics')
+    def metrics():
+        return get_metrics()
 
     # Register our blueprint
     app.register_blueprint(dashboard_blueprint)

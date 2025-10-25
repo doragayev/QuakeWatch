@@ -19,19 +19,19 @@ spec:
     spec:
       containers:
         - name: quakewatch
-          image: quay.io/brancz/prometheus-example-app:v0.4.2
+          image: doragayev/quakewatch:latest
           ports:
-            - name: http          # שם הפורט חשוב עבור Service/ServiceMonitor
-              containerPort: 8080 # /metrics מאזין כאן
+            - name: http
+              containerPort: 5000
           readinessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 5000
             initialDelaySeconds: 3
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 5000
             initialDelaySeconds: 10
             periodSeconds: 10
