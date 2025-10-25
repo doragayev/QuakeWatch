@@ -20,9 +20,9 @@ spec:
       containers:
         - name: quakewatch
           image: quay.io/brancz/prometheus-example-app:v0.4.2
-          # האפליקציה הזו חושפת /metrics על פורט 8080
           ports:
-            - containerPort: 8080
+            - name: http          # ← שם הפורט חייב להיות "http"
+              containerPort: 8080 # ← המטריקות נחשפות על 8080
           readinessProbe:
             httpGet: { path: /, port: 8080 }
             initialDelaySeconds: 3
@@ -31,9 +31,3 @@ spec:
             httpGet: { path: /, port: 8080 }
             initialDelaySeconds: 10
             periodSeconds: 10
-          env:
-            - name: APP_MODE
-              valueFrom:
-                configMapKeyRef:
-                  name: quakewatch-config
-                  key: APP_MODE
