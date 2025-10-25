@@ -12,6 +12,6 @@ spec:
   selector:
     app: quakewatch
   ports:
-    - name: http        # ← חשוב: אותו שם שה-ServiceMonitor מחפש
+    - name: http
       port: 80
-      targetPort: 8080  # ← זה התיקון הקריטי
+      targetPort: 8080

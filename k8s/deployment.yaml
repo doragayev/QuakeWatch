@@ -21,8 +21,8 @@ spec:
         - name: quakewatch
           image: quay.io/brancz/prometheus-example-app:v0.4.2
           ports:
-            - name: http          # ← שם הפורט חייב להיות "http"
-              containerPort: 8080 # ← המטריקות נחשפות על 8080
+            - name: http
+              containerPort: 8080
           readinessProbe:
             httpGet: { path: /, port: 8080 }
             initialDelaySeconds: 3
