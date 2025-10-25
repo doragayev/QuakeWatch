@@ -4,15 +4,15 @@ metadata:
   name: quakewatch
   namespace: quakewatch
   labels:
-    release: monitoring           # ← חייב להתאים ל-*name* של ההתקנה: "monitoring"
+    release: monitoring           # חייב להתאים לשם ההלם-ריליס: "monitoring"
 spec:
   namespaceSelector:
     matchNames:
       - quakewatch
   selector:
     matchLabels:
-      app: quakewatch             # ← בוחר את השירות: metadata.labels.app=quakewatch
+      app: quakewatch             # מתאים ל-label של ה-Service
   endpoints:
-    - port: http                  # ← חייב להתאים ל-ports[*].name בשירות
+    - port: http                  # חייב להתאים לשם הפורט בשירות
       path: /metrics
       interval: 15s
