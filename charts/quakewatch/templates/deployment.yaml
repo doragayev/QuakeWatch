@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quakewatch.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "quakewatch.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  strategy:
+    {{- toYaml .Values.deployment.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "quakewatch.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "quakewatch.selectorLabels" . | nindent 8 }}
+        {{- with .Values.deployment.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- with .Values.deployment.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "quakewatch.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.security.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.app.name }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: FLASK_ENV
+              value: {{ .Values.app.config.flaskEnv | quote }}
+            - name: PYTHONUNBUFFERED
+              value: {{ .Values.app.config.pythonUnbuffered | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.app.config.logLevel | quote }}
+            - name: METRICS_ENABLED
+              value: {{ .Values.app.config.metricsEnabled | quote }}
+            - name: HEALTH_CHECK_ENABLED
+              value: {{ .Values.app.config.healthCheckEnabled | quote }}
+            - name: EARTHQUAKE_API_URL
+              value: {{ .Values.app.config.earthquakeApiUrl | quote }}
+            - name: UPDATE_INTERVAL
+              value: {{ .Values.app.config.updateInterval | quote }}
+            - name: MAX_EARTHQUAKES
+              value: {{ .Values.app.config.maxEarthquakes | quote }}
+            - name: PROMETHEUS_METRICS_PORT
+              value: {{ .Values.app.config.prometheusMetricsPort | quote }}
+            - name: PROMETHEUS_METRICS_PATH
+              value: {{ .Values.app.config.prometheusMetricsPath | quote }}
+          {{- with .Values.deployment.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.deployment.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.security.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            - name: app-logs
+              mountPath: /app/logs
+      volumes:
+        - name: app-logs
+          emptyDir: {}
+      {{- with .Values.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

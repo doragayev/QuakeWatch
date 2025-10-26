@@ -1,0 +1,59 @@
+# AWS Free Tier Configuration for QuakeWatch k3s Cluster
+# This configuration uses only free tier eligible resources
+
+# Project Configuration
+project_name = "quakewatch"
+environment  = "dev"
+
+# AWS Configuration
+aws_region = "us-west-2"  # or us-east-1 for maximum free tier benefits
+
+# SSH Configuration
+# You need to generate your own SSH key pair
+# Run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/quakewatch-key
+# Then copy the public key content here
+ssh_public_key = "YOUR_SSH_PUBLIC_KEY_HERE"
+
+# Security Configuration
+# Replace with your actual IP address
+allowed_ssh_cidrs = ["YOUR_IP_ADDRESS/32"]
+
+# k3s Configuration
+k3s_token = "quakewatch-k3s-token-2025"
+
+# FREE TIER INSTANCE CONFIGURATION
+# Using t2.micro (free tier eligible) for all instances
+k3s_master_count = 1
+k3s_worker_count = 1  # Reduced to 1 worker for free tier
+k3s_master_instance_type = "t2.micro"  # FREE TIER
+k3s_worker_instance_type = "t2.micro"  # FREE TIER
+
+# Bastion Configuration
+create_bastion = true
+bastion_instance_type = "t2.micro"  # FREE TIER
+
+# FREE TIER VOLUME CONFIGURATION
+# Using minimal volumes to stay within free tier limits
+k3s_master_volume_size = 8   # Free tier: 30GB per month
+k3s_master_data_volume_size = 0  # No additional volume
+k3s_worker_volume_size = 8   # Free tier: 30GB per month
+k3s_worker_data_volume_size = 0  # No additional volume
+bastion_volume_size = 8       # Free tier: 30GB per month
+
+# No SSL certificate for free tier
+ssl_certificate_arn = ""
+
+# VPC Configuration (using defaults)
+vpc_cidr = "10.0.0.0/16"
+public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+database_subnet_cidrs = ["10.0.30.0/24", "10.0.40.0/24"]
+
+# Common Tags
+common_tags = {
+  Project     = "QuakeWatch"
+  Environment = "dev"
+  Owner       = "Free Tier User"
+  CostCenter  = "Free Tier"
+  ManagedBy   = "Terraform"
+}

@@ -1,11 +1,258 @@
-replicaCount: 1
+# Default values for quakewatch chart
+# This is a YAML-formatted file.
 
-image:
-  repository: "doragayev/quakewatch"
-  tag: "latest"
-  pullPolicy: IfNotPresent
+# Global settings
+global:
+  namespace: quakewatch
 
+# QuakeWatch application configuration
+app:
+  name: quakewatch
+  version: "1.0.0"
+  image:
+    repository: "doragayev/quakewatch"
+    tag: "latest"
+    pullPolicy: Always
+  
+  # Application configuration
+  config:
+    flaskEnv: "production"
+    pythonUnbuffered: "1"
+    logLevel: "INFO"
+    metricsEnabled: true
+    healthCheckEnabled: true
+    
+    # Earthquake API configuration
+    earthquakeApiUrl: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+    updateInterval: 300  # 5 minutes
+    maxEarthquakes: 100
+    
+    # Monitoring configuration
+    prometheusMetricsPort: 5000
+    prometheusMetricsPath: "/metrics"
 
+# Deployment configuration
+deployment:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  
+  # Resource limits and requests
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 5000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 5000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  # Pod configuration
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5000"
+    prometheus.io/path: "/metrics"
+  
+  # Node selection
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Service configuration
 service:
   type: ClusterIP
-  port: 5000
+  port: 80
+  targetPort: 5000
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    prometheus.io/path: "/metrics"
+
+# NodePort service configuration
+nodeport:
+  enabled: true
+  port: 30000
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  
+  hosts:
+    - host: quakewatch.local
+      paths:
+        - path: /
+          pathType: Prefix
+  
+  tls: []
+
+# Horizontal Pod Autoscaler configuration
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  
+  # Scaling behavior
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
+    interval: 15s
+    path: /metrics
+    port: http
+  
+  prometheusRule:
+    enabled: true
+    labels:
+      release: prometheus
+    rules:
+      - alert: QuakeWatchDown
+        expr: up{job="quakewatch"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "QuakeWatch application is down"
+          description: "QuakeWatch has been down for more than 1 minute"
+      
+      - alert: QuakeWatchHighErrorRate
+        expr: rate(quakewatch_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "QuakeWatch high error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for more than 2 minutes"
+      
+      - alert: QuakeWatchHighResponseTime
+        expr: histogram_quantile(0.95, rate(quakewatch_request_duration_seconds_bucket[5m])) > 5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "QuakeWatch high response time"
+          description: "95th percentile response time is {{ $value }}s for more than 3 minutes"
+
+# Security configuration
+security:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+  
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+        - ALL
+
+# Persistence configuration
+persistence:
+  enabled: false
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+# Network policies
+networkPolicy:
+  enabled: false
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 5000
+
+# RBAC configuration
+rbac:
+  enabled: true
+  create: true
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Pod security policy
+podSecurityPolicy:
+  enabled: false
+
+# Additional labels and annotations
+labels: {}
+annotations: {}
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/name: quakewatch
+  app.kubernetes.io/instance: quakewatch
+  app.kubernetes.io/version: "1.0.0"
+  app.kubernetes.io/component: application
+  app.kubernetes.io/part-of: quakewatch
+
+# Common annotations
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "1"

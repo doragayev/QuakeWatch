@@ -1,6 +1,31 @@
 apiVersion: v2
 name: quakewatch
-description: A Helm chart for the QuakeWatch Flask application
+description: A Helm chart for QuakeWatch - Real-time Earthquake Monitoring Application
 type: application
-version: 0.1.0
+version: 1.0.0
 appVersion: "1.0.0"
+keywords:
+  - earthquake
+  - monitoring
+  - real-time
+  - flask
+  - python
+home: https://github.com/doragayev/quakewatch
+sources:
+  - https://github.com/doragayev/quakewatch
+maintainers:
+  - name: QuakeWatch Team
+    email: team@quakewatch.local
+dependencies:
+  - name: nginx-ingress
+    version: "4.8.3"
+    repository: "https://kubernetes.github.io/ingress-nginx"
+    condition: nginx-ingress.enabled
+  - name: prometheus
+    version: "25.8.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled
+  - name: grafana
+    version: "7.0.0"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: grafana.enabled

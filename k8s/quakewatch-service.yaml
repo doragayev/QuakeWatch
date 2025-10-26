@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quakewatch
+  namespace: quakewatch
+  labels:
+    app: quakewatch
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: quakewatch
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  sessionAffinity: None

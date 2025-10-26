@@ -1,0 +1,63 @@
+# Example Terraform variables file for QuakeWatch k3s Cluster
+# Copy this file to terraform.tfvars and customize the values
+
+# Project Configuration
+project_name = "quakewatch"
+environment  = "dev"
+
+# AWS Configuration
+aws_region = "us-west-2"
+
+# SSH Configuration
+# Generate SSH key pair: ssh-keygen -t rsa -b 4096 -f ~/.ssh/quakewatch-key
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-public-key-here"
+
+# Security Configuration
+# Replace with your IP address for SSH access
+allowed_ssh_cidrs = ["YOUR_IP_ADDRESS/32"]
+
+# k3s Configuration
+k3s_token = "quakewatch-k3s-token-2025-secure-token"
+
+# Instance Configuration
+k3s_master_count = 1
+k3s_worker_count = 2
+k3s_master_instance_type = "t3.medium"
+k3s_worker_instance_type = "t3.large"
+
+# Bastion Configuration
+create_bastion = true
+bastion_instance_type = "t3.micro"
+
+# Volume Configuration
+k3s_master_volume_size = 50
+k3s_master_data_volume_size = 100
+k3s_worker_volume_size = 50
+k3s_worker_data_volume_size = 200
+bastion_volume_size = 20
+
+# SSL Configuration (optional)
+# Uncomment and set your SSL certificate ARN
+# ssl_certificate_arn = "arn:aws:acm:us-west-2:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# k3s High Availability Configuration (optional)
+# Uncomment for HA setup with external datastore
+# k3s_datastore_endpoint = "postgres://username:password@rds-endpoint:5432/k3s"
+# k3s_datastore_cafile = "/etc/ssl/certs/ca-cert.pem"
+# k3s_datastore_certfile = "/etc/ssl/certs/client-cert.pem"
+# k3s_datastore_keyfile = "/etc/ssl/private/client-key.pem"
+
+# VPC Configuration (optional - defaults provided)
+# vpc_cidr = "10.0.0.0/16"
+# public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+# private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+# database_subnet_cidrs = ["10.0.30.0/24", "10.0.40.0/24"]
+
+# Common Tags
+common_tags = {
+  Project     = "QuakeWatch"
+  Environment = "dev"
+  Owner       = "DevOps Team"
+  CostCenter  = "Engineering"
+  ManagedBy   = "Terraform"
+}
