@@ -1,159 +1,256 @@
-![Screenshot of QuakeWatch](static/experts-logo.svg)
+# QuakeWatch - DevOps Project
 
-# QuakeWatch
+## 🌍 **Project Overview**
 
-**QuakeWatch** is a Flask-based web application designed to display real-time and historical earthquake data. It visualizes earthquake statistics with interactive graphs and provides detailed information sourced from the USGS Earthquake API. Built using an object‑oriented design and modular structure, QuakeWatch separates templates, utility functions, and route definitions, making it both scalable and maintainable. The application is also containerized with Docker for easy deployment.
+QuakeWatch is a real-time earthquake monitoring application deployed on AWS using k3s Kubernetes cluster with comprehensive DevOps practices including Infrastructure as Code, GitOps, monitoring, and automation.
 
-
-## Features
-
-- **Real-Time & Historical Data:** Fetches earthquake data from the USGS API.
-- **Interactive Graphs:** Displays earthquake counts over various time periods (e.g., last 30 days, 5-year view) using Matplotlib.
-- **Top Earthquake Events:** Shows the top 5 worldwide earthquakes (last 30 days) by magnitude.
-- **Recent Earthquake Details:** Highlights the most recent earthquake event.
-- **RESTful Endpoints:** Provides endpoints for health checks, status, connectivity tests, and raw data.
-- **Clean UI:** Built with Bootstrap 5, featuring a professional navigation bar with a logo.
-- **Containerization:** Includes Dockerfile and docker-compose.yml for easy containerized deployment.
-
- 
-## Project Structure
+## 📁 **Project Structure**
 
 ```
 QuakeWatch/
-├── app.py                  # Application factory and entry point
-├── dashboard.py            # Blueprint & route definitions using OOP style
-├── utils.py                # Helper functions and custom Jinja2 filters
-├── requirements.txt        # Python dependencies
-├── static/
-│   └── experts-logo.svg    # Logo file used in the UI
-└── templates/              # Jinja2 HTML templates
-    ├── base.html        # Base template with common layout and navigation
-    ├── main_page.html      # Home page content
-    └── graph_dashboard.h tml# Dashboard view with graphs and earthquake details
-├── Dockerfile              # Docker image build instructions
-├── docker-compose.yml      # Docker Compose configuration
-
+├── 📁 applications/                 # Application Components
+│   ├── 📁 docker/                  # Docker Configuration
+│   │   ├── Dockerfile              # Container definition
+│   │   ├── requirements.txt        # Python dependencies
+│   │   ├── app.py                  # Flask application
+│   │   ├── dashboard.py            # Dashboard module
+│   │   ├── utils.py                # Utility functions
+│   │   └── metrics.py              # Prometheus metrics
+│   ├── 📁 helm/                    # Helm Charts
+│   │   └── 📁 quakewatch/          # QuakeWatch Helm chart
+│   │       ├── Chart.yaml          # Chart metadata
+│   │       ├── values.yaml         # Chart values
+│   │       └── 📁 templates/        # Helm templates
+│   └── 📁 k8s/                     # Kubernetes Manifests
+│       ├── deployment.yaml         # Application deployment
+│       ├── service.yaml            # ClusterIP service
+│       ├── nodeport.yaml           # NodePort service
+│       ├── ingress.yaml            # Ingress configuration
+│       ├── configmap.yaml          # Application config
+│       ├── hpa.yaml                # Horizontal Pod Autoscaler
+│       └── 📁 argocd/               # ArgoCD Applications
+│           ├── quakewatch-app.yaml
+│           ├── monitoring-app.yaml
+│           └── alerting-app.yaml
+├── 📁 infrastructure/              # Infrastructure as Code
+│   └── 📁 terraform/               # Terraform Configuration
+│       ├── main.tf                 # Provider configuration
+│       ├── vpc.tf                  # VPC and networking
+│       ├── security-groups.tf      # Security groups
+│       ├── iam.tf                  # IAM roles and policies
+│       ├── ec2.tf                  # EC2 instances and ALB
+│       ├── provisioners.tf         # k3s installation automation
+│       ├── variables.tf            # Input variables
+│       ├── outputs.tf              # Output values
+│       ├── 📁 scripts/             # User data scripts
+│       │   ├── k3s-master-userdata.sh
+│       │   ├── k3s-worker-userdata.sh
+│       │   ├── bastion-userdata.sh
+│       │   ├── deploy-quakewatch.sh
+│       │   └── validate-cluster.sh
+│       └── 📁 docs/                 # Infrastructure documentation
+│           ├── AWS_INFRASTRUCTURE_DOCUMENTATION.md
+│           ├── K3S_DEPLOYMENT_GUIDE.md
+│           ├── K3S_INSTALLATION_GUIDE.md
+│           ├── FREE_TIER_SETUP.md
+│           └── README.md
+├── 📁 monitoring/                  # Monitoring Stack
+│   └── 📁 prometheus/              # Prometheus & Grafana
+│       ├── prometheus-alerts.yaml  # Alert rules
+│       ├── alertmanager-config.yaml # AlertManager config
+│       └── 📁 grafana-dashboards/   # Grafana dashboards
+│           ├── quakewatch-application-dashboard.json
+│           ├── cluster-health-dashboard.json
+│           └── system-overview-dashboard.json
+├── 📁 docs/                        # Documentation
+│   ├── PROJECT_DELIVERABLES.md    # Complete deliverables overview
+│   ├── 📁 architecture/            # Architecture documentation
+│   ├── 📁 deployment/              # Deployment guides
+│   └── 📁 operations/              # Operations documentation
+│       ├── MONITORING_DOCUMENTATION.md
+│       ├── DASHBOARD_SAMPLES.md
+│       ├── TROUBLESHOOTING_GUIDE.md
+│       ├── ALERTING_GUIDE.md
+│       └── README_MONITORING.md
+└── 📁 scripts/                     # Utility Scripts
+    ├── import-dashboards.sh       # Dashboard import
+    ├── test-alerts.sh             # Alert testing
+    └── alert-webhook-receiver.py  # Alert webhook
 ```
 
-## Installation
+## 🚀 **Quick Start**
 
-### Locally
+### **Prerequisites**
+- AWS Account with appropriate permissions
+- Terraform >= 1.0
+- kubectl
+- Helm 3.x
 
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/yourusername/QuakeWatch.git
-   cd QuakeWatch # Enter the project directory
-   ```
-
-2. **Set Up a Virtual Environment (optional but recommended):**
-
-   Creating a virtual environment helps keep your project dependencies isolated from other Python projects on your system.
-
-   ```bash
-   python -m venv venv	      # Create a virtual environment named 'venv'	
-   source venv/bin/activate   # Activate the virtual environment on macOS/Linux
-   # On Windows, activate with:
-   # venv\Scripts\activate
-   ```
-
-3. **Install Dependencies:**
-
-   After activating the virtual environment, install the required Python packages using:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Running the Application Locally
-
-1. **Start the Flask Application:**
-
-   ```bash
-   python app.py
-   ```
-
-2. **Access the Application:**
-
-   Open your browser and visit [http://127.0.0.1:5000](http://127.0.0.1:5000) to view the dashboard.
-
-   > **Note:** If you run the app on a different port, replace `5000` with the port you used.
-
-## Custom Jinja2 Filter
-
-The project includes a custom filter `timestamp_to_str` that converts epoch timestamps to human-readable strings. This filter is registered during application initialization and is used in the templates to format timestamps nicely.
-
-For example, in the HTML templates, you might see:
-
-```jinja
-{{ earthquake.timestamp | timestamp_to_str }}
-```
-
-## Known Issues
-
-- **SSL Warning:** You might see a warning about LibreSSL when using `urllib3`.  
-  This is informational and does not affect the functionality of the application.
-
-- **Matplotlib Backend:** The application forces Matplotlib to use the `Agg` backend  
-  for headless rendering (e.g., when running in Docker or on a server without a GUI).  
-  Make sure this setting is applied *before* any Matplotlib imports to avoid GUI-related errors.
-
-> These issues are normal and expected. They do not impact how QuakeWatch functions.
-
-
-## Running with Docker
-
-You can also run the application inside a Docker container:
-
+### **1. Deploy Infrastructure**
 ```bash
-docker build -t quakewatch:latest .
-docker run -p 8080:5000 quakewatch:latest
+cd infrastructure/terraform
+cp terraform.tfvars.free-tier terraform.tfvars
+# Edit terraform.tfvars with your details
+terraform init
+terraform plan
+terraform apply
 ```
 
-## Docker Support
-
-This project includes:
-- `Dockerfile`: instructions to build the Docker image
-- `docker-compose.yml`: optional file to run multiple services together (if you add it)
-
-These make it easier to deploy QuakeWatch in different environments.
-
-## Docker Hub Image
-
-You can also pull the prebuilt image:
-
+### **2. Access Your Cluster**
 ```bash
-docker pull yourusername/quakewatch:latest
+# Get connection information
+terraform output
+
+# SSH to bastion host
+ssh -i ~/.ssh/quakewatch-key ubuntu@$(terraform output -raw bastion_public_ip)
 ```
 
-## Running with Docker Compose
-
-You can also run the application using Docker Compose, which builds the image and runs the container automatically:
-
+### **3. Deploy QuakeWatch**
 ```bash
-docker-compose up --build
+# Deploy using Kubernetes manifests
+kubectl apply -f applications/k8s/
+
+# Or deploy using Helm
+helm install quakewatch applications/helm/quakewatch
 ```
 
-Once running, open your browser and go to:
+## 🏗️ **Architecture**
 
-http://localhost:8080
+### **Infrastructure**
+- **AWS VPC**: Multi-AZ setup with public/private subnets
+- **k3s Cluster**: Lightweight Kubernetes cluster
+- **Application Load Balancer**: External access
+- **Security Groups**: Network segmentation
+- **IAM Roles**: Minimal required permissions
 
+### **Application**
+- **QuakeWatch**: Flask-based earthquake monitoring
+- **Prometheus**: Metrics collection and alerting
+- **Grafana**: Visualization and dashboards
+- **ArgoCD**: GitOps continuous deployment
 
-This is because the application inside the container listens on port 5000, but Docker Compose maps it to port 8080 on your local machine.
+## 📊 **Features**
 
-## Kubernetes Deployment
+### **✅ Infrastructure as Code**
+- Complete Terraform configuration
+- Automated k3s installation
+- Security best practices
+- Cost optimization
 
-This project includes Kubernetes manifests to deploy QuakeWatch with:
+### **✅ GitOps Deployment**
+- ArgoCD for continuous deployment
+- Git-based configuration management
+- Automated sync and self-healing
 
-- Deployment (2 replicas)
-- NodePort Service exposing port 5000
-- Horizontal Pod Autoscaler (HPA) based on CPU usage
-- ConfigMap and Secret for config and sensitive data
-- CronJob for periodic tasks
+### **✅ Monitoring & Observability**
+- Prometheus metrics collection
+- Grafana dashboards
+- AlertManager notifications
+- Comprehensive health checks
 
-### Deploy on Minikube
+### **✅ Security**
+- Network segmentation
+- IAM roles with least privilege
+- Encrypted storage
+- Security contexts
 
-1. Enable metrics-server addon (required for HPA):
+## 🌐 **Access Methods**
+
+### **External Access**
+1. **NodePort**: `http://<node-ip>:30000`
+2. **ALB**: `http://<alb-dns-name>`
+3. **Port-Forward**: `kubectl port-forward -n quakewatch svc/quakewatch 8080:80`
+
+### **Monitoring Access**
+- **Grafana**: http://localhost:3000 (admin/prom-operator)
+- **Prometheus**: http://localhost:9090
+- **AlertManager**: http://localhost:9093
+
+## 💰 **Cost Optimization**
+
+### **Free Tier Usage**
+- **EC2**: t2.micro instances (750 hours/month)
+- **EBS**: 30GB storage (free tier)
+- **S3**: 5GB storage (free tier)
+- **ALB**: 750 hours/month (free tier)
+
+## 📚 **Documentation**
+
+### **Architecture**
+- [AWS Infrastructure Documentation](infrastructure/terraform/docs/AWS_INFRASTRUCTURE_DOCUMENTATION.md)
+- [k3s Deployment Guide](infrastructure/terraform/docs/K3S_DEPLOYMENT_GUIDE.md)
+- [k3s Installation Guide](infrastructure/terraform/docs/K3S_INSTALLATION_GUIDE.md)
+
+### **Operations**
+- [Monitoring Documentation](docs/operations/MONITORING_DOCUMENTATION.md)
+- [Troubleshooting Guide](docs/operations/TROUBLESHOOTING_GUIDE.md)
+- [Alerting Guide](docs/operations/ALERTING_GUIDE.md)
+
+### **Deployment**
+- [GitOps Deployment Guide](docs/deployment/GITOPS_DEPLOYMENT_GUIDE.md)
+- [Free Tier Setup](infrastructure/terraform/docs/FREE_TIER_SETUP.md)
+
+## 🔧 **Troubleshooting**
+
+### **Common Issues**
+1. **k3s Installation**: Check service status and logs
+2. **Network Connectivity**: Verify security groups
+3. **QuakeWatch Access**: Check pods and services
+4. **IAM Permissions**: Verify instance profiles
+
+### **Debug Commands**
 ```bash
-minikube addons enable metrics-server
+# Check cluster status
+kubectl get nodes
+kubectl get pods -A
+kubectl get svc -A
+
+# Check QuakeWatch
+kubectl get all -n quakewatch
+kubectl logs -n quakewatch -l app=quakewatch
 ```
+
+## 🎯 **Project Deliverables**
+
+### **✅ Infrastructure**
+- Complete Terraform configuration
+- AWS VPC and EC2 setup
+- Security groups and IAM roles
+- Load balancer configuration
+
+### **✅ Application**
+- Kubernetes manifests
+- Helm charts
+- Docker configuration
+- GitOps setup
+
+### **✅ Monitoring**
+- Prometheus configuration
+- Grafana dashboards
+- AlertManager setup
+- Comprehensive documentation
+
+## 📈 **Next Steps**
+
+1. **Production Deployment**: Scale to production environment
+2. **CI/CD Pipeline**: Implement automated testing and deployment
+3. **Security Hardening**: Additional security measures
+4. **Disaster Recovery**: Backup and recovery procedures
+
+## 🤝 **Contributing**
+
+This project demonstrates advanced DevOps practices including:
+- Infrastructure as Code
+- GitOps
+- Monitoring and Observability
+- Security best practices
+- Cost optimization
+- Automation
+
+## 📄 **License**
+
+This project is for educational and demonstration purposes.
+
+---
+
+**QuakeWatch DevOps Project** - A comprehensive demonstration of modern DevOps practices with AWS, Kubernetes, and monitoring.
